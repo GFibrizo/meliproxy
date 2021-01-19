@@ -55,6 +55,9 @@ Es decir, cada redis sentinel realiza tareas de:
 
 ## Implementación
 
+![Impl de API Proxy](https://github.com/GFibrizo/meliproxy/blob/main/images/Copy%20of%20Meli%20Challenge.png)
+
+
 ### Load Balancer
 Como Load Balancer se utilizó Nginx, aunque para poder rutear los requests a las diferentes instancias de API Proxy se utilizó una configuración de Nginx que se aprovecha del nombre de la red docker donde estan levantadas y del hecho de que todas funcionan en el mismo puerto.
 El punto de entrada termina siendo Nginx pero termina siendo Docker, entonces, quien termina realizando el balanceo de carga por medio de un esquema Round Robin.
