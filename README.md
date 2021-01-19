@@ -22,16 +22,32 @@ Este repositorio contiene el diseño e implementación del challenge de mercadol
 - Además, redis permite tener alta disponibilidad por medio de un esquema llamado Redis Sentinel.
 
 #### Redis Sentinel
+![Redis Sentinel](https://github.com/GFibrizo/meliproxy/blob/main/images/RedisSentinel.png)
+Este esquema permite tener alta disponibilidad de la base de datos redis.
+En el caso de que el master se caiga, los redis sentinels se dan cuenta por medio de un mecanismo de healthcheck y mediante consenso. Como respuesta, promueven al slave a nuevo master y notifican al cliente de la base de datos quien es el nuevo master.
 
+Es decir, cada redis sentinel realiza tareas de:
+- **Monitoreo:** checkean si el master y slave estan corriendo y funcionando correctamente
+- **Notificación:** notifica a quien tenga que hacerlo mediante una API cuando alguna de las instancias monitoreadas falla.
+- **Recuperación automatica de fallos:** ante una falla del master, promueve un slave a master, y hace que el resto de los slaves conozcan el nuevo master.
 
 
 ### Estadisticas
-
+- Para el diseño se eligió modelar esta parte mediante una API de estadisticas a la cual cada instancia de API proxy enviará estadisticas de requests agregadas en un cierto periodo de tiempo. Se elige agregar localmente en cada instacia esas métricas durante un periodo de tiempo (por ej. 30s o 1m) para evitar sobrecargar la API de estadisticas.
+- Otras opciones consideradas para el diseño podrían haber sido utilizar una cola de mensajes
 
 
 ## Implementación
 
+### Load Balancer
 
+### API Proxy
+
+### Cache
+
+### Estadisticas
+
+![Dashboard de estadisticas](https://github.com/GFibrizo/meliproxy/blob/main/images/Dashboard.png)
 
 ### Como levantar el proyecto
 
