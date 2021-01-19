@@ -22,7 +22,7 @@ Este repositorio contiene el diseño e implementación del challenge de mercadol
 - Además, redis permite tener alta disponibilidad por medio de un esquema llamado Redis Sentinel.
 
 #### Redis Sentinel
-<img src="https://github.com/GFibrizo/meliproxy/blob/main/images/RedisSentinel.png" width="600">
+<img src="https://github.com/GFibrizo/meliproxy/blob/main/images/RedisSentinel.png" width="500">
 Este esquema permite tener alta disponibilidad de la base de datos redis.
 En el caso de que el master se caiga, los redis sentinels se dan cuenta por medio de un mecanismo de healthcheck y mediante consenso. Como respuesta, promueven al slave a nuevo master y notifican al cliente de la base de datos quien es el nuevo master.
 
