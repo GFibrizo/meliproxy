@@ -1,0 +1,12 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+ 
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: flask
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['meliproxy_proxy_1:9090', 'meliproxy_proxy_2:9090', 'meliproxy_proxy_3:9090', 'meliproxy_proxy_4:9090', 'meliproxy_proxy_5:9090']

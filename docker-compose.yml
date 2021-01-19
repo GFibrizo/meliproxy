@@ -1,0 +1,75 @@
+version: '3.5'
+
+networks:
+  default:
+    driver: bridge
+    name: proxy
+
+services:
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=str0ng_passw0rd
+    ports:
+      - '49153:6379'
+  redis-slave:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+      - REDIS_PASSWORD=str0ng_passw0rd
+    ports:
+      - '6379'
+    depends_on:
+      - redis
+  redis-sentinel:
+    image: 'bitnami/redis-sentinel:latest'
+    environment:
+      - REDIS_MASTER_PASSWORD=str0ng_passw0rd
+    depends_on:
+      - redis
+      - redis-slave
+    ports:
+      - '26379-26381:26379'
+  proxy:
+    image: proxy-server:latest
+    hostname: proxy
+    expose:
+      - "8080"
+      - "5000"
+    environment:
+      - URL=https://reqres.in/api/
+      - REDIS_HOST=meliproxy_redis_1
+      - REDIS_PORT=6379
+      - prometheus_multiproc_dir=/tmp
+    depends_on:
+      - redis-sentinel
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - proxy
+    ports:
+      - "4000:4000"
+  prometheus:
+    image: "quay.io/prometheus/prometheus"
+    ports: ["9090:9090"]
+    volumes: ["./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"]
+  generator:
+    build:
+      context: generator
+    stop_signal: SIGKILL
+  grafana:
+    image: grafana/grafana:5.1.0
+    volumes:
+      - ./grafana/config.ini:/etc/grafana/grafana.ini
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/default.yaml
+      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - 3000:3000
+
+
