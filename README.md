@@ -26,7 +26,9 @@ El algoritmo de Least Connections podría alivianar esta situación enviando a o
 Como mecanismos de control para regular la cantidad de requests a los diferentes paths (servicios) de api.mercadolibre.com se propone:
 - **[Circuit Breaker](https://docs.microsoft.com/en-us/azure/architecture/patterns/circuit-breaker):** Mecanismo para recuperación ante fallos en requests, via apertura del circuito por una cierta cantidad de tiempo para darle tiempo al sistema que produjo el fallo de recuperarse, y luego mediante requests de prueba probar su estado y reanudar la comunicación normal (cerrar el circuito) una vez que el request de prueba fue exitoso. 
 - **Rate Limiter:** Limitar la cantidad de requests que un cierto path pueda recibir en una cierta cantidad de tiempo. También limitar la cantidad de requests que un origen pueda enviar, de esta manera evitamos casos como ataques de denegacion de servicios.
-
+  - Limitar la cantidad de requests a un servicio particular de api.mercadolibre.com, limitando via el path de la url.
+  - Limitar la cantidad de requests desde un origen usando el header X-Forwarded-For
+- **Caching de requests y sus respuestas:** explicado en la siguiente sección
 
 ### Cache
 - Se quiere una caché para almacenar temporalmente requests hechos a cada instancia de API Proxy y sus correspondientes respuestas desde api.mercadolibre.com
@@ -66,10 +68,9 @@ Se utilizaron las librerias:
   - resetea el contador de fallos leugo de cada ejecución exitosa
   - abre el circuito y previene de futuras ejecuciones luego de 5 fallas consecutivas
   - cambia a el circuito a medio abierto y permite una ejecución de prueba luego de 30s de recovery
-  - cierra el circuito si la ejecución de prueba fue exitosa 
+  - cierra el circuito si la ejecución de prueba fue exitosa
 - **[prometheus_flask_exporter](https://github.com/rycus86/prometheus_flask_exporter):** expone en un puerto de la aplicación (9090 por defecto) un endpoint para que se sea consultado por un server Prometheus y así le disponibiliza una serie de métricas para que éste consuma.
-- **[alisaifee/flask-limiter](https://flask-limiter.readthedocs.io/en/stable/):** limita la cantidad de requests que un endpoint recibe luego de superado un threshold. 
-
+- **[alisaifee/flask-limiter](https://flask-limiter.readthedocs.io/en/stable/):** limita la cantidad de requests que un endpoint recibe luego de superado un threshold. Usando como key el resultado de la función **get_remote_address** obtenemos el valor del header **X-Forwarded-For** por lo que podemos limitar por ip origen.
 
 ### Cache
 
